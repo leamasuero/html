@@ -1,0 +1,9 @@
+{
+    "name": "lebenlabs/html",
+    "description": "Html helper",
+    "type": "library",
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^7.1.*"
+    }
+}
