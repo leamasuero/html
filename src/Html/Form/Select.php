@@ -57,7 +57,7 @@ class Select
         return $this;
     }
 
-    public function selected(string $selected): Select
+    public function selected(?string $selected): Select
     {
         $this->selected = $selected;
         return $this;

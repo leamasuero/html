@@ -38,7 +38,7 @@ class Checkbox
         $this->checked = $checked;
     }
 
-    public static function create(string $name, string $value, ?bool $checked): Checkbox
+    public static function create(string $name, string $value, ?bool $checked = false): Checkbox
     {
         return new self($name, $value, $checked);
     }
