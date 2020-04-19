@@ -9,6 +9,9 @@
   "autoload": {
     "psr-4": {
       "Lebenlabs\\Html\\": "src/"
-    }
+    },
+    "files": [
+      "src/Helpers/form.php"
+    ]
   }
 }
