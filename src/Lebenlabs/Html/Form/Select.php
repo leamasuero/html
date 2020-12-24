@@ -43,6 +43,11 @@ class Select
     /**
      * @var bool
      */
+    private $multiple;
+
+    /**
+     * @var bool
+     */
     private $readonly;
 
     public function __construct(string $name, ?array $options = [])
@@ -54,6 +59,7 @@ class Select
         $this->options = $options;
 
         $this->title = null;
+        $this->multiple = false;
         $this->disabled = false;
         $this->readonly = false;
     }
@@ -62,7 +68,6 @@ class Select
     {
         return new self($name, $options);
     }
-
 
     public function id(string $id): Select
     {
@@ -85,6 +90,12 @@ class Select
     public function title(string $title): Select
     {
         $this->title = $title;
+        return $this;
+    }
+
+    public function multiple(bool $multiple): Select
+    {
+        $this->multiple = $multiple;
         return $this;
     }
 
@@ -141,6 +152,11 @@ class Select
         return $this->readonly ? 'readonly' : '';
     }
 
+    private function getMultiple(): string
+    {
+
+    }
+
     public function render(): string
     {
         return sprintf('<select name="%s" %s %s %s %s %s >%s</select>',
@@ -150,6 +166,7 @@ class Select
             $this->getDisabled(),
             $this->getReadonly(),
             $this->getTitle(),
+            $this->getMultiple(),
             $this->getOptions()
         );
     }
