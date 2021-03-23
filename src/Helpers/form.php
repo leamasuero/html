@@ -16,3 +16,12 @@ if (!function_exists('select')) {
         return new \Lebenlabs\Html\Form\Select($name, $options);
     }
 }
+
+
+if (!function_exists('datalist')) {
+
+    function datalist(string $name, ?array $options = []): \Lebenlabs\Html\Form\Datalist
+    {
+        return new \Lebenlabs\Html\Form\Datalist($name, $options);
+    }
+}
