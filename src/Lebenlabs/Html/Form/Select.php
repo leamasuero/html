@@ -16,12 +16,17 @@ class Select
     private $name;
 
     /**
+     * @var string
+     */
+    private $form;
+
+    /**
      * @var array
      */
     private $options;
 
     /**
-     * @var strings
+     * @var array
      */
     private $selected;
 
@@ -55,7 +60,8 @@ class Select
         $this->id = null;
         $this->name = $name;
         $this->class = null;
-        $this->selected = null;
+        $this->form = null;
+        $this->selected = [];
         $this->options = $options;
 
         $this->title = null;
@@ -72,6 +78,12 @@ class Select
     public function id(string $id): Select
     {
         $this->id = $id;
+        return $this;
+    }
+
+    public function form(string $form): Select
+    {
+        $this->form = $form;
         return $this;
     }
 
@@ -93,7 +105,7 @@ class Select
         return $this;
     }
 
-    public function multiple(bool $multiple): Select
+    public function multiple(bool $multiple = true): Select
     {
         $this->multiple = $multiple;
         return $this;
@@ -105,9 +117,18 @@ class Select
         return $this;
     }
 
-    public function selected(?string $selected): Select
+    /**
+     * @param string|array $selected
+     * @return $this
+     */
+    public function selected($selected): Select
     {
-        $this->selected = $selected;
+        if (is_array($selected)) {
+            $this->selected = $selected;
+            return $this;
+        }
+
+        $this->selected[] = $selected;
         return $this;
     }
 
@@ -119,6 +140,11 @@ class Select
     private function getTitle(): string
     {
         return $this->title ? "title='{$this->title}'" : '';
+    }
+
+    private function getForm(): string
+    {
+        return $this->form ? "form='{$this->form}'" : '';
     }
 
     private function getClass(): ?string
@@ -135,7 +161,9 @@ class Select
     {
         $optionsHtml = '';
         foreach ($this->options as $id => $value) {
-            $selected = (empty($this->selected) && empty($id)) || ($this->selected && $this->selected == $id) ? 'selected' : '';
+//            $selected = (empty($this->selected) && empty($id)) || ($this->selected && $this->selected == $id) ? 'selected' : '';
+            $selected = (empty($this->selected) && empty($id)) || (in_array($id, $this->selected)) ? 'selected' : '';
+
             $disabled = empty($id) ? 'disabled' : '';
             $optionsHtml .= sprintf('<option value="%s" %s %s>%s</option>', $id, $selected, $disabled, $value);
         }
@@ -160,7 +188,7 @@ class Select
 
     public function render(): string
     {
-        return sprintf('<select name="%s" %s %s %s %s %s %s>%s</select>',
+        return sprintf('<select name="%s" %s %s %s %s %s %s %s>%s</select>',
             $this->getName(),
             $this->getClass(),
             $this->getId(),
@@ -168,6 +196,7 @@ class Select
             $this->getReadonly(),
             $this->getTitle(),
             $this->getMultiple(),
+            $this->getForm(),
             $this->getOptions()
         );
     }
