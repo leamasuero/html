@@ -196,6 +196,10 @@ class Datalist
 
     private function getOptions(): string
     {
+        if (count($this->options) == 0) {
+            return '';
+        }
+
         $optionsHtml = '';
         foreach ($this->options as $id => $value) {
             $optionsHtml .= "<option data-id='{$id}' data-value='{$value}' value='{$value}'>{$value}</option>";
