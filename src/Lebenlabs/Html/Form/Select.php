@@ -28,6 +28,11 @@ class Select
     /**
      * @var array
      */
+    private $disabledOptions;
+
+    /**
+     * @var array
+     */
     private $selected;
 
     /**
@@ -63,6 +68,7 @@ class Select
         $this->form = null;
         $this->selected = [];
         $this->options = $options;
+        $this->disabledOptions = [];
 
         $this->title = null;
         $this->multiple = false;
@@ -132,6 +138,21 @@ class Select
         return $this;
     }
 
+    /**
+     * @param string|array $disabled
+     * @return $this
+     */
+    public function disableOptions($disabled): Select
+    {
+        if (is_array($disabled)) {
+            $this->disabledOptions = $disabled;
+            return $this;
+        }
+
+        $this->disabledOptions[] = $disabled;
+        return $this;
+    }
+
     private function getName(): string
     {
         return $this->name;
@@ -161,10 +182,9 @@ class Select
     {
         $optionsHtml = '';
         foreach ($this->options as $id => $value) {
-//            $selected = (empty($this->selected) && empty($id)) || ($this->selected && $this->selected == $id) ? 'selected' : '';
             $selected = (empty($this->selected) && empty($id)) || (in_array($id, $this->selected)) ? 'selected' : '';
+            $disabled = in_array($id, $this->disabledOptions) ? 'disabled' : '';
 
-            $disabled = empty($id) ? 'disabled' : '';
             $optionsHtml .= sprintf('<option value="%s" %s %s>%s</option>', $id, $selected, $disabled, $value);
         }
 
@@ -206,3 +226,4 @@ class Select
         return $this->render();
     }
 }
+
