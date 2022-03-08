@@ -36,9 +36,14 @@ class Select
     private $selected;
 
     /**
-     * @var string
+     * @var array
      */
-    private $class;
+    private $classes;
+
+    /**
+     * @var array
+     */
+    private $data;
 
     /**
      * @var string
@@ -64,11 +69,13 @@ class Select
     {
         $this->id = null;
         $this->name = $name;
-        $this->class = null;
+        $this->classes = [];
         $this->form = null;
         $this->selected = [];
         $this->options = $options;
         $this->disabledOptions = [];
+
+        $this->data = [];
 
         $this->title = null;
         $this->multiple = false;
@@ -93,9 +100,36 @@ class Select
         return $this;
     }
 
-    public function class(string $class): Select
+    public function class(string $class, bool $condition = true): Select
     {
-        $this->class = $class;
+        if ($condition) {
+            $this->classes[] = $class;
+        }
+        return $this;
+    }
+
+    /**
+     * @param array $classes
+     * @return $this
+     */
+    public function classes(array $classes): Select
+    {
+//        array:3 [▼
+//              0 => "form-control"
+//              1 => "form-class"
+//              "is-invalid" => false
+//        ]
+
+        foreach ($classes as $key => $value) {
+            if (is_bool($value)) {
+                if ($value) {
+                    $this->classes[] = $key;
+                }
+            } else {
+                $this->classes[] = $value;
+            }
+        }
+
         return $this;
     }
 
@@ -153,6 +187,12 @@ class Select
         return $this;
     }
 
+    public function data(string $key, string $value): Select
+    {
+        $this->data[$key] = $value;
+        return $this;
+    }
+
     private function getName(): string
     {
         return $this->name;
@@ -170,7 +210,8 @@ class Select
 
     private function getClass(): ?string
     {
-        return $this->class ? "class='{$this->class}'" : '';
+        $class = join(' ', $this->classes);
+        return $this->classes ? "class='{$class}'" : '';
     }
 
     private function getId(): ?string
@@ -206,9 +247,19 @@ class Select
         return $this->multiple ? 'multiple' : '';
     }
 
+    private function getData(): string
+    {
+        $data = "";
+        foreach ($this->data as $key => $value) {
+            $data .= " data-{$key}=\"{$value}\"";
+        }
+
+        return $data;
+    }
+
     public function render(): string
     {
-        return sprintf('<select name="%s" %s %s %s %s %s %s %s>%s</select>',
+        return sprintf('<select name="%s" %s %s %s %s %s %s %s %s>%s</select>',
             $this->getName(),
             $this->getClass(),
             $this->getId(),
@@ -217,6 +268,7 @@ class Select
             $this->getTitle(),
             $this->getMultiple(),
             $this->getForm(),
+            $this->getData(),
             $this->getOptions()
         );
     }
