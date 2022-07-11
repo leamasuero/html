@@ -27,19 +27,14 @@ class Datalist
     private $options;
 
     /**
-     * @var array
-     */
-    private $data;
-
-    /**
      * @var strings
      */
     private $selected;
 
     /**
-     * @var array
+     * @var string
      */
-    private $classes;
+    private $class;
 
     /**
      * @var string
@@ -75,12 +70,10 @@ class Datalist
     {
         $this->id = null;
         $this->name = $name;
-        $this->classes = [];
+        $this->class = null;
         $this->selected = null;
         $this->listId = null;
         $this->options = $options;
-
-        $this->data = [];
 
         $this->title = null;
         $this->placeHolder = 'Seleccionar';
@@ -101,30 +94,9 @@ class Datalist
         return $this;
     }
 
-    public function class(string $class, bool $condition = true): Datalist
+    public function class(string $class): Datalist
     {
-        if ($condition) {
-            $this->classes[] = $class;
-        }
-        return $this;
-    }
-
-    /**
-     * @param array $classes
-     * @return $this
-     */
-    public function classes(array $classes): Datalist
-    {
-        foreach ($classes as $key => $value) {
-            if (is_bool($value)) {
-                if ($value) {
-                    $this->classes[] = $key;
-                }
-            } else {
-                $this->classes[] = $value;
-            }
-        }
-
+        $this->class = $class;
         return $this;
     }
 
@@ -177,12 +149,6 @@ class Datalist
         return $this;
     }
 
-    public function data(string $key, string $value): Datalist
-    {
-        $this->data[$key] = $value;
-        return $this;
-    }
-
     private function getName(): string
     {
         return $this->name;
@@ -213,10 +179,9 @@ class Datalist
         return $this->placeHolder ? "placeholder='{$this->placeHolder}'" : '';
     }
 
-    private function getClass(): ?string
+    private function getClass(): string
     {
-        $class = join(' ', $this->classes);
-        return $this->classes ? "class='{$class}'" : '';
+        return $this->class ? "class='{$this->class}'" : '';
     }
 
     private function getAutocomplete(): string
@@ -231,10 +196,6 @@ class Datalist
 
     private function getOptions(): string
     {
-        if (count($this->options) == 0) {
-            return '';
-        }
-
         $optionsHtml = '';
         foreach ($this->options as $id => $value) {
             $optionsHtml .= "<option data-id='{$id}' data-value='{$value}' value='{$value}'>{$value}</option>";
@@ -253,21 +214,10 @@ class Datalist
         return $this->readonly ? 'readonly' : '';
     }
 
-    private function getData(): string
-    {
-        $data = "";
-        foreach ($this->data as $key => $value) {
-            $data .= " data-{$key}=\"{$value}\"";
-        }
-
-        return $data;
-    }
-
     public function render(): string
     {
-        return sprintf('<input name="%s" %s %s %s %s %s %s %s %s %s list="%s"/>%s',
+        return sprintf('<input name="%s" %s %s %s %s %s %s %s %s list="%s"/>%s',
             $this->getName(),
-            $this->getData(),
             $this->getSelected(),
             $this->getAutocomplete(),
             $this->getPlaceholder(),

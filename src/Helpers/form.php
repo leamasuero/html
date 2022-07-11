@@ -8,6 +8,14 @@ if (!function_exists('checkbox')) {
     }
 }
 
+if (!function_exists('radio')) {
+
+    function radio(string $name, string $value, ?bool $checked = false): \Lebenlabs\Html\Form\Radio
+    {
+        return new \Lebenlabs\Html\Form\Radio($name, $value, $checked);
+    }
+}
+
 
 if (!function_exists('select')) {
 
