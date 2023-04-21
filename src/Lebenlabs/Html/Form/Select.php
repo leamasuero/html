@@ -28,12 +28,22 @@ class Select
     /**
      * @var array
      */
+    private $disabledOptions;
+
+    /**
+     * @var array
+     */
     private $selected;
 
     /**
-     * @var string
+     * @var array
      */
-    private $class;
+    private $classes;
+
+    /**
+     * @var array
+     */
+    private $data;
 
     /**
      * @var string
@@ -59,10 +69,13 @@ class Select
     {
         $this->id = null;
         $this->name = $name;
-        $this->class = null;
+        $this->classes = [];
         $this->form = null;
         $this->selected = [];
         $this->options = $options;
+        $this->disabledOptions = [];
+
+        $this->data = [];
 
         $this->title = null;
         $this->multiple = false;
@@ -87,9 +100,36 @@ class Select
         return $this;
     }
 
-    public function class(string $class): Select
+    public function class(string $class, bool $condition = true): Select
     {
-        $this->class = $class;
+        if ($condition) {
+            $this->classes[] = $class;
+        }
+        return $this;
+    }
+
+    /**
+     * @param array $classes
+     * @return $this
+     */
+    public function classes(array $classes): Select
+    {
+//        array:3 [▼
+//              0 => "form-control"
+//              1 => "form-class"
+//              "is-invalid" => false
+//        ]
+
+        foreach ($classes as $key => $value) {
+            if (is_bool($value)) {
+                if ($value) {
+                    $this->classes[] = $key;
+                }
+            } else {
+                $this->classes[] = $value;
+            }
+        }
+
         return $this;
     }
 
@@ -105,7 +145,7 @@ class Select
         return $this;
     }
 
-    public function multiple(bool $multiple): Select
+    public function multiple(?bool $multiple = true): Select
     {
         $this->multiple = $multiple;
         return $this;
@@ -132,6 +172,27 @@ class Select
         return $this;
     }
 
+    /**
+     * @param string|array $disabled
+     * @return $this
+     */
+    public function disableOptions($disabled): Select
+    {
+        if (is_array($disabled)) {
+            $this->disabledOptions = $disabled;
+            return $this;
+        }
+
+        $this->disabledOptions[] = $disabled;
+        return $this;
+    }
+
+    public function data(string $key, string $value): Select
+    {
+        $this->data[$key] = $value;
+        return $this;
+    }
+
     private function getName(): string
     {
         return $this->name;
@@ -149,7 +210,8 @@ class Select
 
     private function getClass(): ?string
     {
-        return $this->class ? "class='{$this->class}'" : '';
+        $class = join(' ', $this->classes);
+        return $this->classes ? "class='{$class}'" : '';
     }
 
     private function getId(): ?string
@@ -161,10 +223,9 @@ class Select
     {
         $optionsHtml = '';
         foreach ($this->options as $id => $value) {
-//            $selected = (empty($this->selected) && empty($id)) || ($this->selected && $this->selected == $id) ? 'selected' : '';
             $selected = (empty($this->selected) && empty($id)) || (in_array($id, $this->selected)) ? 'selected' : '';
+            $disabled = in_array($id, $this->disabledOptions) ? 'disabled' : '';
 
-            $disabled = empty($id) ? 'disabled' : '';
             $optionsHtml .= sprintf('<option value="%s" %s %s>%s</option>', $id, $selected, $disabled, $value);
         }
 
@@ -186,9 +247,19 @@ class Select
         return $this->multiple ? 'multiple' : '';
     }
 
+    private function getData(): string
+    {
+        $data = "";
+        foreach ($this->data as $key => $value) {
+            $data .= " data-{$key}=\"{$value}\"";
+        }
+
+        return $data;
+    }
+
     public function render(): string
     {
-        return sprintf('<select name="%s" %s %s %s %s %s %s %s>%s</select>',
+        return sprintf('<select name="%s" %s %s %s %s %s %s %s %s>%s</select>',
             $this->getName(),
             $this->getClass(),
             $this->getId(),
@@ -197,6 +268,7 @@ class Select
             $this->getTitle(),
             $this->getMultiple(),
             $this->getForm(),
+            $this->getData(),
             $this->getOptions()
         );
     }
@@ -206,4 +278,3 @@ class Select
         return $this->render();
     }
 }
-

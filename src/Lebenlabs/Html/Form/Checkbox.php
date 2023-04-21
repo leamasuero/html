@@ -25,9 +25,9 @@ class Checkbox
     protected $checked;
 
     /**
-     * @var string
+     * @var array
      */
-    protected $class;
+    protected $classes;
 
     /**
      * @var string
@@ -38,6 +38,11 @@ class Checkbox
      * @var string
      */
     protected $form;
+
+    /**
+     * @var array
+     */
+    protected $data;
 
     /**
      * @var bool
@@ -53,9 +58,11 @@ class Checkbox
     {
         $this->id = null;
         $this->name = $name;
-        $this->class = null;
+        $this->classes = [];
         $this->value = $value;
         $this->checked = $checked;
+
+        $this->data = [];
 
         $this->title = null;
         $this->form = null;
@@ -75,21 +82,42 @@ class Checkbox
         return $this;
     }
 
-    public function class(string $class): Checkbox
+    public function class(string $class, bool $condition = true): Checkbox
     {
-        $this->class = $class;
+        if ($condition) {
+            $this->classes[] = $class;
+        }
         return $this;
     }
 
-    public function title(string $title): Checkbox
+    /**
+     * @param array $classes
+     * @return $this
+     */
+    public function classes(array $classes): Checkbox
     {
-        $this->title = $title;
+        foreach ($classes as $key => $value) {
+            if (is_bool($value)) {
+                if ($value) {
+                    $this->classes[] = $key;
+                }
+            } else {
+                $this->classes[] = $value;
+            }
+        }
+
         return $this;
     }
 
     public function form(string $form): Checkbox
     {
         $this->form = $form;
+        return $this;
+    }
+
+    public function title(string $title): Checkbox
+    {
+        $this->title = $title;
         return $this;
     }
 
@@ -111,15 +139,21 @@ class Checkbox
         return $this;
     }
 
+    public function data(string $key, string $value): Checkbox
+    {
+        $this->data[$key] = $value;
+        return $this;
+    }
 
     protected function getName(): string
     {
         return $this->name;
     }
 
-    protected function getClass(): string
+    protected function getClass(): ?string
     {
-        return $this->class ? "class='{$this->class}'" : '';
+        $class = join(' ', $this->classes);
+        return $this->classes ? "class='{$class}'" : '';
     }
 
     protected function getTitle(): string
@@ -131,7 +165,6 @@ class Checkbox
     {
         return $this->form ? "form='{$this->form}'" : '';
     }
-
 
     protected function getId(): string
     {
@@ -158,18 +191,29 @@ class Checkbox
         return $this->readonly ? 'readonly' : '';
     }
 
+    protected function getData(): string
+    {
+        $data = "";
+        foreach ($this->data as $key => $value) {
+            $data .= " data-{$key}=\"{$value}\"";
+        }
+
+        return $data;
+    }
+
     public function render(): string
     {
-        return sprintf('<input type="checkbox" name="%s" value="%s" %s %s %s %s %s %s %s />',
+        return sprintf('<input type="checkbox" name="%s" value="%s" %s %s %s %s %s %s %s %s />',
             $this->getName(),
             $this->getValue(),
+            $this->getData(),
             $this->getClass(),
             $this->getId(),
             $this->getChecked(),
             $this->getDisabled(),
             $this->getReadonly(),
             $this->getTitle(),
-            $this->getForm(),
+            $this->getForm()
         );
     }
 
@@ -179,4 +223,3 @@ class Checkbox
     }
 
 }
-
