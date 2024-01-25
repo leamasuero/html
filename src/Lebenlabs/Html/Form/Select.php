@@ -222,11 +222,22 @@ class Select
     private function getOptions(): string
     {
         $optionsHtml = '';
-        foreach ($this->options as $id => $value) {
+        $data = '';
+        foreach ($this->options as $id => $optionValue) {
+
+            if (is_array($optionValue)) {
+                $value = $optionValue['value'];
+                foreach ($optionValue as $k => $v) {
+                    $data .= "data-{$k}=\"{$v}\" ";
+                }
+
+            } else {
+                $value = $optionValue;
+            }
+
             $selected = (empty($this->selected) && empty($id)) || (in_array($id, $this->selected)) ? 'selected' : '';
             $disabled = in_array($id, $this->disabledOptions) ? 'disabled' : '';
-
-            $optionsHtml .= sprintf('<option value="%s" %s %s>%s</option>', $id, $selected, $disabled, $value);
+            $optionsHtml .= sprintf('<option value="%s" %s %s %s>%s</option>', $id, $selected, $disabled, $data, $value);
         }
 
         return $optionsHtml;
